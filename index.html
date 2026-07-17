@@ -230,7 +230,7 @@
     <span class="hot">SYS//ONLINE</span>
     <span class="cy">USER: denvermotel</span>
     <span class="spacer"></span>
-    <span>LAT 45.46 · LON 9.19</span>
+    <!-- <span>LAT 45.46 · LON 9.19</span> -->
     <span class="cy">v{{ year }}.0</span>
   </div>
 
@@ -246,7 +246,7 @@
       . G I T H U B . I O
     </div>
     <div class="mono" style="margin-top:26px;font-size:13px;letter-spacing:3px;color:var(--green);text-shadow:0 0 10px rgba(157,255,42,0.4)">
-      &gt; strumenti artigianali per commercialisti &amp; smanettoni <span class="blink">_</span>
+      &gt; strumenti per domare il fisco italiano (e altre utility sparse) <span class="blink">_</span>
     </div>
   </div>
 
@@ -263,10 +263,11 @@
     </div>
   </div>
 
-  <!-- ticker -->
+  <!-- ticker 
   <div class="ticker">
     <span>◤ STAMPA-FIRE ◢ FEC-PLUS ◤ FE-UTILITY ◢ CASSETTO-UTILITY ◤ BRIOFE ◢ BRIOFEVIEW ◤ MADE IN ITALY 🇮🇹 ◢ &nbsp;&nbsp;&nbsp;</span>
   </div>
+  -->
 
   <!-- section header -->
   <div style="max-width:1180px;margin:56px auto 30px;padding:0 24px;display:flex;align-items:center;gap:18px" class="fade">
@@ -291,7 +292,7 @@
         <div class="desc">{{ repo.desc }}</div>
         <div class="foot">
           <span class="lang">▸ {{ repo.lang }}</span>
-          <span class="go">OPEN_NODE &gt;_</span>
+          <span class="go">INFO &gt;_</span>
         </div>
       </a>
     </sc-for>
@@ -299,7 +300,7 @@
 
   <!-- footer -->
   <div class="rail" style="border-bottom:none;border-top:1px solid rgba(0,234,255,0.18);justify-content:center;margin-top:20px">
-    <span class="mono" style="letter-spacing:3px">└─ © {{ year }} denvermotel · forgiato con ❤ in Italia 🇮🇹 · GPL / open source ─┘</span>
+    <span class="mono" style="letter-spacing:3px">└─ © {{ year }} Giovanni Genna @denvermotel · forgiato con ❤ in Italia 🇮🇹 ─┘</span>
   </div>
   <div style="text-align:center;padding:26px 20px 60px">
     <span class="glitch mono" data-text="END_OF_LINE" style="font-family:'Orbitron',sans-serif;font-weight:700;font-size:clamp(16px,4vw,34px);letter-spacing:0.2em;color:var(--pink)">END_OF_LINE</span>
@@ -387,15 +388,10 @@ class Component extends DCLogic {
         url: 'https://github.com/denvermotel/BrioFE'
       },
       {
-        name: 'BrioFEview', emoji: '👁️', accent: accents.green, lang: 'XSLT', tag: 'VIEWER',
+        name: 'BrioFEview', emoji: '👁️', accent: accents.green, lang: 'Python', tag: 'VIEWER',
         desc: 'Visualizzatore desktop di fatture elettroniche XML (anche P7M): stampa, export PDF e integrazione con Windows.',
         url: 'https://github.com/denvermotel/BrioFEview'
       },
-      {
-        name: 'denvermotel.github.io', emoji: '🌐', accent: accents.cyan, lang: 'JavaScript', tag: 'SITE',
-        desc: 'Il codice di questo sito: la vetrina che raccoglie tutti i repository pubblici dell\'utente denvermotel.',
-        url: 'https://github.com/denvermotel/denvermotel.github.io'
-      }
     ];
 
     const repos = list.map((r, i) => ({ ...r, idx: String(i + 1).padStart(2, '0') }));
