@@ -118,16 +118,19 @@
     .statusbar > div.fit { flex: 0 0 auto; }
 
     /* ---------- welcome window ---------- */
-    .hero { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
-    .hero .big { font-size: 54px; line-height: 1; }
-    .wordart {
-      font-family: "Times New Roman", Times, serif; font-style: italic; font-weight: bold;
-      font-size: clamp(30px, 6.5vw, 58px); line-height: 1.05; letter-spacing: .01em;
-      background: linear-gradient(180deg, #ff0 0%, #f80 45%, #c00 100%);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-      filter: drop-shadow(3px 3px 0 #000080);
-      word-break: break-word;
+    .hero { text-align: center; padding: 6px 0 2px; }
+    .wa-stage {
+      display: flex; align-items: center; justify-content: center;
+      min-height: clamp(130px, 24vw, 200px); padding: 18px 0;
+      overflow: hidden;
+      cursor: pointer; user-select: none; perspective: 600px;
     }
+    .wa {
+      display: inline-flex; align-items: flex-end; white-space: nowrap;
+      font-size: clamp(26px, 8.4vw, 72px); line-height: 1;
+      transition: transform .35s ease;
+    }
+    .wl { display: inline-block; transition: transform .35s ease; }
     .sub { margin-top: 8px; font-size: 13px; }
     .sub b { color: var(--navy); }
     .groupbox {
@@ -250,11 +253,12 @@
       </div>
       <div class="body">
         <div class="hero">
-          <div class="big">🇮🇹</div>
-          <div style="flex:1;min-width:220px">
-            <div class="wordart">DENVERMOTEL</div>
-            <div class="sub">Strumenti per domare il <b>fisco italiano</b> (e altre utility sparse).</div>
+          <div class="wa-stage" onclick="{{ nextWordArt }}" title="Clicca per cambiare WordArt">
+            <div class="wa" style="{{ wa.box }}" aria-label="DENVERMOTEL">
+              <sc-for list="{{ wa.letters }}" as="l"><span class="wl" style="{{ l.style }}">{{ l.ch }}</span></sc-for>
+            </div>
           </div>
+          <div class="sub">Strumenti per domare il <b>fisco italiano</b> (e altre utility sparse).</div>
         </div>
         <div class="groupbox">
           <span class="legend">Informazioni sul sistema</span>
@@ -346,8 +350,65 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
+// estrusione 3D "alla Word 97": tante drop-shadow da 1px in fila
+const extrude = (color, n, dx = 1, dy = 1) =>
+  Array.from({ length: n }, () => `drop-shadow(${dx}px ${dy}px 0 ${color})`).join(' ');
+
+// forme: t va da 0 (prima lettera) a 1 (ultima)
+const WA_SHAPES = {
+  flat:     () => 'none',
+  archUp:   (t) => { const c = t - .5; return `translateY(${(c * c * 1.6).toFixed(3)}em) rotate(${(c * 44).toFixed(1)}deg)`; },
+  archDown: (t) => { const c = t - .5; return `translateY(${(-c * c * 1.6).toFixed(3)}em) rotate(${(-c * 44).toFixed(1)}deg)`; },
+  wave:     (t) => `translateY(${(Math.sin(t * Math.PI * 2) * -.16).toFixed(3)}em) rotate(${(Math.cos(t * Math.PI * 2) * -10).toFixed(1)}deg)`,
+  bulge:    (t) => { const c = t - .5; return `scaleY(${(1 + (1 - 4 * c * c) * .55).toFixed(3)})`; },
+  pinch:    (t) => { const c = t - .5; return `scaleY(${(.6 + 4 * c * c * .7).toFixed(3)})`; },
+  rise:     (t) => `scale(${(.62 + t * .6).toFixed(3)})`,
+  fall:     (t) => `scale(${(1.2 - t * .55).toFixed(3)})`,
+  stairs:   (t) => `translateY(${(-t * .45).toFixed(3)}em) skewY(-8deg)`,
+  flag:     (t) => `translateY(${(Math.sin(t * Math.PI * 1.5) * -.12).toFixed(3)}em) scaleY(${(1 + t * .5).toFixed(3)})`,
+};
+
+const IMPACT = 'Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif';
+const BLACK  = '"Arial Black", "Arial Bold", Gadget, sans-serif';
+const TIMES  = '"Times New Roman", Times, serif';
+const ARIAL  = 'Arial, Helvetica, sans-serif';
+
+// preset ispirati alla galleria WordArt di Office 95/97
+const WORDART = [
+  { font: BLACK, weight: 900, color: '#fff', stroke: '1.5px #000', shape: 'flat' },
+  { font: BLACK, weight: 900, color: '#000', shape: 'archUp', box: 'rotate(-6deg)' },
+  { font: TIMES, weight: 700, color: '#000', shape: 'archDown' },
+  { font: IMPACT, color: '#000', shape: 'bulge', spacing: '.02em' },
+  { font: ARIAL, weight: 900, italic: true, color: '#fff', stroke: '1.5px #3a3aa0', shadow: 'drop-shadow(4px 4px 0 #9a9ad8)', shape: 'flat' },
+  { font: TIMES, color: '#4a6c96', fill: 'linear-gradient(180deg,#9ab4d4,#2d4f80 60%,#9ab4d4)', shadow: 'drop-shadow(3px 3px 0 #b8c4d4)', shape: 'flat' },
+  { font: BLACK, weight: 900, fill: 'linear-gradient(90deg,#c8c8ff,#5050e0 50%,#c8c8ff)', shadow: extrude('#28288c', 5), shape: 'flat' },
+  { font: IMPACT, fill: 'linear-gradient(180deg,#fff,#bbb 45%,#666 55%,#eee)', stroke: '1px #555', shadow: 'drop-shadow(3px 3px 1px rgba(0,0,0,.35))', shape: 'flat', spacing: '.12em' },
+  { font: IMPACT, fill: 'linear-gradient(180deg,#ff2020 0 50%,#2040ff 50% 100%)', shadow: extrude('#000060', 4), shape: 'flat', spacing: '.03em' },
+  { font: BLACK, weight: 900, fill: 'linear-gradient(180deg,#ffe000,#ff6a00)', shadow: extrude('#b03000', 3), shape: 'flat' },
+  { font: BLACK, weight: 900, italic: true, fill: 'linear-gradient(90deg,#d040ff,#7000c0)', shadow: extrude('#3c0068', 4), shape: 'bulge' },
+  { font: TIMES, italic: true, color: '#c8d8c8', shadow: 'drop-shadow(0 .32em 0 #1a7a1a)', shape: 'flat', box: 'scaleY(.9)' },
+  { font: BLACK, weight: 900, fill: 'linear-gradient(90deg,#ff0000,#ff8c00,#ffee00,#00c000,#0060ff,#9000ff)', shadow: 'drop-shadow(5px 3px 2px rgba(0,0,0,.35))', shape: 'flat', box: 'perspective(400px) rotateX(28deg)' },
+  { font: TIMES, color: '#5aa0d0', fill: 'linear-gradient(180deg,#bfe6ff,#3b88c8)', stroke: '1px #2a6898', shape: 'archUp' },
+  { font: IMPACT, fill: 'linear-gradient(180deg,#c89870,#6b3d1e)', shadow: extrude('#3a1e0a', 3), shape: 'pinch' },
+  { font: TIMES, weight: 700, italic: true, fill: 'linear-gradient(180deg,#fff,#ffb0b0 50%,#c03030)', stroke: '1px #600', shape: 'wave' },
+  { font: IMPACT, fill: 'linear-gradient(180deg,#fff7a0,#e0a000 40%,#7a4a00 60%,#ffd84a)', shadow: extrude('#5a3400', 3), shape: 'wave', box: 'skewX(-12deg)' },
+  { font: BLACK, weight: 900, fill: 'linear-gradient(180deg,#a0f0ff,#00a0e0 50%,#003c96)', shadow: extrude('#002060', 6), shape: 'wave' },
+  { font: BLACK, weight: 900, color: '#f0f000', stroke: '1px #6a6a00', shadow: extrude('#8a8a00', 3), shape: 'stairs', box: 'rotate(-4deg)' },
+  { font: ARIAL, weight: 700, color: '#333', fill: 'linear-gradient(180deg,#888,#222)', shadow: extrude('#bbb', 6, 2, 1), shape: 'flat', box: 'skewX(-10deg)' },
+  { font: IMPACT, fill: 'linear-gradient(180deg,#4a7a4a,#0a2a0a)', shadow: extrude('#000', 5), shape: 'rise', box: 'rotate(-8deg)' },
+  { font: IMPACT, fill: 'linear-gradient(180deg,#fff,#aaa)', stroke: '1px #444', shadow: extrude('#666', 7, 2, 2), shape: 'archDown', box: 'rotate(6deg)' },
+  { font: BLACK, weight: 900, fill: 'linear-gradient(180deg,#ffd000,#ff5000 60%,#c02000)', shadow: extrude('#801000', 6), shape: 'fall', box: 'perspective(500px) rotateY(-16deg) scale(.85)' },
+  { font: IMPACT, fill: 'repeating-linear-gradient(180deg,#d00 0 .12em,#fff .12em .24em,#0040c0 .24em .36em)', stroke: '1px #000', shape: 'flag' },
+];
+
+// ?wordart=N forza un preset (utile per provarli tutti)
+function pickInitialWordArt() {
+  const n = parseInt(new URLSearchParams(location.search).get('wordart'), 10);
+  return n >= 0 && n < WORDART.length ? n : Math.floor(Math.random() * WORDART.length);
+}
+
 class Component extends DCLogic {
-  state = { visits: 1337, startOpen: false, now: new Date() };
+  state = { visits: 1337, startOpen: false, now: new Date(), wa: pickInitialWordArt() };
 
   componentDidMount() {
     let stored = 1336;
@@ -357,6 +418,7 @@ class Component extends DCLogic {
     this.setState({ visits: next });
 
     this._clock = setInterval(() => this.setState({ now: new Date() }), 1000);
+    this._wa = setInterval(() => this.nextWordArt(), 6000);
     this._onDocClick = () => { if (this.state.startOpen) this.setState({ startOpen: false }); };
     this._onKey = (e) => { if (e.key === 'Escape' && this.state.startOpen) this.setState({ startOpen: false }); };
     document.addEventListener('click', this._onDocClick);
@@ -365,6 +427,7 @@ class Component extends DCLogic {
 
   componentWillUnmount() {
     if (this._clock) clearInterval(this._clock);
+    if (this._wa) clearInterval(this._wa);
     document.removeEventListener('click', this._onDocClick);
     document.removeEventListener('keydown', this._onKey);
   }
@@ -375,6 +438,44 @@ class Component extends DCLogic {
   };
 
   stop = (e) => { if (e) e.stopPropagation(); };
+
+  // cambia WordArt a caso (mai uguale alla precedente)
+  nextWordArt = () => {
+    let n = this.state.wa;
+    while (n === this.state.wa) n = Math.floor(Math.random() * WORDART.length);
+    this.setState({ wa: n });
+  };
+
+  buildWordArt(preset) {
+    const text = 'DENVERMOTEL';
+    const chars = text.split('');
+    const last = chars.length - 1;
+    const letters = chars.map((ch, i) => {
+      const t = i / last;
+      const style = {
+        fontFamily: preset.font,
+        fontWeight: preset.weight || 'normal',
+        fontStyle: preset.italic ? 'italic' : 'normal',
+        transform: WA_SHAPES[preset.shape || 'flat'](t, i),
+        transformOrigin: preset.origin || '50% 100%',
+      };
+      if (preset.fill) {
+        // un unico gradiente continuo sulla parola intera, ritagliato lettera per lettera
+        style.backgroundImage = preset.fill;
+        style.backgroundSize = (chars.length * 100) + '% 100%';
+        style.backgroundPosition = (t * 100) + '% 0';
+        style.WebkitBackgroundClip = 'text';
+        style.backgroundClip = 'text';
+        style.color = 'transparent';
+      } else {
+        style.color = preset.color;
+      }
+      if (preset.stroke) style.WebkitTextStroke = preset.stroke;
+      if (preset.shadow) style.filter = preset.shadow;
+      return { ch, style };
+    });
+    return { letters, box: { transform: preset.box || 'none', letterSpacing: preset.spacing || '0' } };
+  }
 
   renderVals() {
     const list = [
@@ -430,6 +531,8 @@ class Component extends DCLogic {
       year: now.getFullYear(),
       time: pad(now.getHours()) + ':' + pad(now.getMinutes()),
       date: pad(now.getDate()) + '/' + pad(now.getMonth() + 1) + '/' + now.getFullYear(),
+      wa: this.buildWordArt(WORDART[this.state.wa]),
+      nextWordArt: this.nextWordArt,
       startOpen: this.state.startOpen,
       startClass: this.state.startOpen ? 'start on' : 'start',
       toggleStart: this.toggleStart,
