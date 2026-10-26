@@ -392,6 +392,11 @@ class Component extends DCLogic {
         desc: 'Visualizzatore desktop di fatture elettroniche XML (anche P7M): stampa, export PDF e integrazione con Windows.',
         url: 'https://github.com/denvermotel/BrioFEview'
       },
+	  {
+        name: 'FeXML-Parser', emoji: '-️', accent: accents.green, lang: 'Python - Javascript', tag: 'Parser',
+        desc: 'Parser di fatture elettroniche in formato XML nella doppia versione Python e Javascript usabile già via browser.',
+        url: 'https://github.com/denvermotel/FeXML-Parser'
+      },
     ];
 
     const repos = list.map((r, i) => ({ ...r, idx: String(i + 1).padStart(2, '0') }));
