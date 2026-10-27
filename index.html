@@ -165,6 +165,10 @@
     }
     .details-head span { background: var(--face); box-shadow: var(--raised); padding: 3px 8px; }
 
+    img.pix { image-rendering: pixelated; width: 34px; height: 34px; display: block; margin: 0 auto; }
+    .item:hover img.pix, .item:focus img.pix { filter: none; }
+    .startmenu .mi img.pix { width: 20px; height: 20px; }
+
     /* ---------- taskbar ---------- */
     .taskbar {
       position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
@@ -317,7 +321,7 @@
         <div class="grid">
           <sc-for list="{{ repos }}" as="repo" hint-placeholder-count="6">
             <a href="{{ repo.url }}" target="_blank" rel="noopener" class="item" title="{{ repo.name }}">
-              <div class="ico">{{ repo.emoji }}</div>
+              <div class="ico"><sc-if value="{{ repo.icon }}"><img class="pix" src="{{ repo.icon }}" alt=""></sc-if><sc-if value="{{ repo.noIcon }}">{{ repo.emoji }}</sc-if></div>
               <div style="min-width:0">
                 <span class="name">{{ repo.name }}</span>
                 <div class="desc">{{ repo.desc }}</div>
@@ -348,7 +352,7 @@
     <ul>
       <li class="label">Repository</li>
       <sc-for list="{{ repos }}" as="repo">
-        <li><a href="{{ repo.url }}" target="_blank" rel="noopener"><span class="mi">{{ repo.emoji }}</span>{{ repo.name }}</a></li>
+        <li><a href="{{ repo.url }}" target="_blank" rel="noopener"><span class="mi"><sc-if value="{{ repo.icon }}"><img class="pix" src="{{ repo.icon }}" alt=""></sc-if><sc-if value="{{ repo.noIcon }}">{{ repo.emoji }}</sc-if></span>{{ repo.name }}</a></li>
       </sc-for>
       <li><hr></li>
       <li><a href="https://github.com/denvermotel" target="_blank" rel="noopener"><span class="mi">👤</span>Profilo GitHub</a></li>
@@ -500,32 +504,32 @@ class Component extends DCLogic {
   renderVals() {
     const list = [
       {
-        name: 'fe-utility', emoji: '🔧', lang: 'JavaScript', tag: 'Userscript',
+        name: 'fe-utility', icon: 'img/fe-utility.png', emoji: '🔧', lang: 'JavaScript', tag: 'Userscript',
         desc: 'Aggiunge una barra degli strumenti al portale "Fatture e Corrispettivi" dell\'Agenzia delle Entrate, con export Excel e download massivo.',
         url: 'https://github.com/denvermotel/fe-utility'
       },
       {
-        name: 'Cassetto_Utility', emoji: '🗄️', lang: 'JavaScript', tag: 'Userscript',
+        name: 'Cassetto_Utility', icon: 'img/Cassetto_Utility.png', emoji: '🗄️', lang: 'JavaScript', tag: 'Userscript',
         desc: 'Utility per il Cassetto Fiscale dell\'Agenzia delle Entrate: toolbar con download massivo di documenti.',
         url: 'https://github.com/denvermotel/Cassetto_Utility'
       },
       {
-        name: 'FeC-Plus', emoji: '💾', lang: 'Python', tag: 'Scraper',
+        name: 'FeC-Plus', icon: 'img/FeC-Plus.png', emoji: '💾', lang: 'Python', tag: 'Scraper',
         desc: 'Automatizza accesso e download dei dati dal portale "Fatture e Corrispettivi" dell\'Agenzia delle Entrate.',
         url: 'https://github.com/denvermotel/FeC-Plus'
       },
       {
-        name: 'FeXML-Parser', emoji: '🧩', lang: 'Python / JavaScript', tag: 'Parser',
+        name: 'FeXML-Parser', icon: 'img/FeXML-Parser.png', emoji: '🧩', lang: 'Python / JavaScript', tag: 'Parser',
         desc: 'Converte fatture elettroniche (anche .p7m) e corrispettivi telematici in JSON, Markdown, CSV ed Excel. Tutto in locale: web, exe portabile o modulo Python.',
         url: 'https://github.com/denvermotel/FeXML-Parser'
       },
       {
-        name: 'BrioFE-light', emoji: '🧾', lang: 'HTML', tag: 'Web app',
+        name: 'BrioFE-light', icon: 'img/BrioFE-light.png', emoji: '🧾', lang: 'HTML', tag: 'Web app',
         desc: 'Semplice programma di fatturazione online per generare fatture elettroniche in formato XML.',
         url: 'https://github.com/denvermotel/BrioFE-light'
       },
       {
-        name: 'BrioFEview', emoji: '👁️', lang: 'Python', tag: 'Viewer',
+        name: 'BrioFEview', icon: 'img/BrioFEview.png', emoji: '👁️', lang: 'Python', tag: 'Viewer',
         desc: 'Visualizzatore di fatture elettroniche XML integrato con Windows.',
         url: 'https://github.com/denvermotel/BrioFEview'
       },
@@ -535,7 +539,7 @@ class Component extends DCLogic {
         url: 'https://github.com/denvermotel/XBLR-Utility'
       },
       {
-        name: 'stampa-fire', emoji: '🖨️', lang: 'Python', tag: 'Windows',
+        name: 'stampa-fire', icon: 'img/stampa-fire.png', emoji: '🖨️', lang: 'Python', tag: 'Windows',
         desc: 'Installazione automatica in batch di stampanti di rete su Windows 10/11, configurabile tramite file Excel.',
         url: 'https://github.com/denvermotel/stampa-fire'
       },
@@ -550,7 +554,7 @@ class Component extends DCLogic {
     const pad = (n) => String(n).padStart(2, '0');
 
     return {
-      repos: list,
+      repos: list.map(r => ({ ...r, icon: r.icon || '', noIcon: !r.icon })),
       repoCount: list.length,
       visits: String(this.state.visits).padStart(6, '0'),
       year: now.getFullYear(),
